@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>职场意识进化自测</title>
+    <style>
+        body { margin: 0; background: #fcfaf2; font-family: sans-serif; color: #2c3e50; display: flex; justify-content: center; padding: 20px; }
+        #app { width: 100%; max-width: 500px; text-align: center; margin-top: 50px; }
+        .screen { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: left; }
+        .btn { width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid #eee; border-radius: 8px; background: #fff; cursor: pointer; text-align: left; font-size: 16px; }
+        .btn:active { background: #f0f0f0; }
+        .start-btn { background: #2c3e50; color: white; border: none; padding: 15px 50px; border-radius: 30px; cursor: pointer; font-size: 18px; margin-top: 20px; }
+        .q-text { font-size: 18px; line-height: 1.6; margin-bottom: 30px; font-weight: bold; }
+        .res-title { font-size: 24px; color: #2c3e50; margin-bottom: 10px; font-weight: bold; text-align: center; }
+        .res-desc { line-height: 1.8; color: #444; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="intro" class="screen active">
+        <h1>职场意识进化自测</h1>
+        <p>基于行为显化与内在觉察的双重维度</p >
+        <button class="start-btn" onclick="goQuiz()">开始测评</button>
+    </div>
+
+    <div id="quiz" class="screen">
+        <div class="card">
+            <div id="question" class="q-text"></div>
+            <button class="btn" onclick="next(1)">完全不符 (1分)</button>
+            <button class="btn" onclick="next(2)">较不符合 (2分)</button>
+            <button class="btn" onclick="next(3)">一般 (3分)</button>
+            <button class="btn" onclick="next(4)">比较符合 (4分)</button>
+            <button class="btn" onclick="next(5)">完全符合 (5分)</button>
+        </div>
+        <p id="progress" style="margin-top: 20px; color: #999;"></p >
+    </div>
+
+    <div id="result" class="screen">
+        <div class="card">
+            <div id="res-tag" style="color: #8e9eab; font-weight: bold; text-align: center;"></div>
+            <div id="res-title" class="res-title"></div>
+            <div id="res-score" style="text-align: center; font-size: 14px; color: #999;"></div>
+            <div id="res-desc" class="res-desc"></div>
+            <button class="start-btn" style="width:100%" onclick="location.reload()">重新测试</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        "在职场中，我能清晰设定目标，并总能通过具体路径拿到预期结果。",
+        "我善于调动身边的资源（人脉、资金、工具）来为我的目标服务。",
+        "面对复杂挑战或突发状况，我能迅速决策执行，很少因情绪波动耽误进度。",
+        "目前我的职位、收入水平与付出成正比，能感受到物质反馈。",
+        "我的专业能力有明显辨识度，大家遇到核心问题时会第一时间找我。",
+        "当发生冲突时，我能迅速跳出来“观察”情绪，而不是被它牵着走。",
+        "我能清晰看到自己在职场中反复出现的“卡点”模式及内在根源。",
+        "做重大决策时，除了逻辑分析，我经常能跟随准确的“直觉”。",
+        "我能敏锐感知到自己和他人的能量场变化，并知道如何调频。",
+        "我能感受到我的工作与更高的生命使命之间有深层的连接。"
+    ];
+
+    let idx = 0;
+    let scores = [];
+
+    function goQuiz() {
+        document.getElementById('intro').style.display = 'none';
+        document.getElementById('quiz').style.display = 'block';
+        showQ();
+    }
+
+    function showQ() {
+        document.getElementById('question').innerText = (idx + 1) + ". " + questions[idx];
+        document.getElementById('progress').innerText = "第 " + (idx + 1) + " / 10 题";
+    }
+
+    function next(s) {
+        scores.push(s);
+        if (idx < 9) {
+            idx++;
+            showQ();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        const sx = scores.slice(0, 5).reduce((a, b) => a + b, 0);
+        const sy = scores.slice(5, 10).reduce((a, b) => a + b, 0);
+        
+        const getL = (v) => v <= 11 ? '低' : (v <= 18 ? '中' : '高');
+        const lx = getL(sx);
+        const ly = getL(sy);
+        
+        const data = {
+            '低x低': ['受害者模式', '力量交给外部，困于负面循环。建议从找回微小的自主权开始。'],
+            '中x低': ['随波逐流的搬砖人', '被动执行，缺乏自我意识。虽然稳定但内心容易空虚。'],
+            '高x低': ['精致的利己主义者', '生存力极强。建议在拿到结果之余，开启内在探索。'],
+            '低x中': ['迷茫的摸索者', '旧认知已破，新路径未建。现在需要的是行动的勇气。'],
+            '中x中': ['稳定的职场螺丝钉', '稳定但停滞。正在等待一个让你彻底破圈的契机。'],
+            '高x中': ['高耗能的奋斗者', '靠意志力硬撑。建议变“拼命”为“顺流”。'],
+            '低x高': ['深陷泥潭的先知', '拥有高维智慧，但尚未落地。建议寻找互补的搭档。'],
+            '中x高': ['觉醒中的观察者', '能量转化关键期。保持觉察，物质世界的奖赏即将到来。'],
+            '高x高': ['顺流而上的领航员', '高维觉察与三维显化的完美融合。你是职场的引领者。']
+        };
+
+        const res = data[lx + 'x' + ly];
+        document.getElementById('res-tag').innerText = lx + "显化力 × " + ly + "觉察力";
+        document.getElementById('res-title').innerText = res[0];
+        document.getElementById('res-score').innerText = "显化分: " + sx + " | 觉察分: " + sy;
+        document.getElementById('res-desc').innerText = res[1];
+        
+        document.getElementById('quiz').style.display = 'none';
+        document.getElementById('result').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
